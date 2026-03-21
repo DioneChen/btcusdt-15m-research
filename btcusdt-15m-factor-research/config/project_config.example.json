@@ -1,0 +1,15 @@
+{
+  "symbol": "BTCUSDT",
+  "pair": "BTCUSDT",
+  "interval": "15m",
+  "start": "2025-06-01",
+  "end": "2026-03-01",
+  "workspace_dir": "workspace",
+  "train_start": "2025-06-01",
+  "train_end": "2025-12-01",
+  "val_start": "2025-12-01",
+  "val_end": "2026-01-16",
+  "test_start": "2026-01-16",
+  "test_end": "2026-03-01",
+  "fee_bps": 0.0
+}

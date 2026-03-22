@@ -1,0 +1,52 @@
+{
+  "dataset": {
+    "symbol": "BTCUSDT",
+    "interval": "15m",
+    "start": "2025-06-01",
+    "end": "2026-03-01",
+    "train_shape": [
+      17568,
+      46
+    ],
+    "val_shape": [
+      4416,
+      46
+    ],
+    "test_shape": [
+      4208,
+      46
+    ]
+  },
+  "final_two_factor_model": {
+    "factors": {
+      "vol_surge_4h_z_lag1": 1,
+      "mom_8h_z_lag1": -1
+    },
+    "threshold": {
+      "name": "q80_20",
+      "long_th": 0.5210193934122136,
+      "short_th": -0.574675299410354
+    },
+    "validation_metrics": {
+      "total_return": 0.04545164733227747,
+      "annual_return": 0.4230080292586782,
+      "annual_vol": 0.24693611139102448,
+      "sharpe": 1.5517498812684294,
+      "max_drawdown": -0.05013903603907399,
+      "win_rate": 0.16553442028985507,
+      "avg_turnover": 0.026041666666666668,
+      "num_obs": 4416
+    },
+    "test_metrics": {
+      "total_return": 0.003080507172914082,
+      "annual_return": 0.025948992691132267,
+      "annual_vol": 0.4564165705223516,
+      "sharpe": 0.2845005507756214,
+      "max_drawdown": -0.19828493441082795,
+      "win_rate": 0.22314638783269963,
+      "avg_turnover": 0.03231939163498099,
+      "num_obs": 4208
+    }
+  },
+  "comparison_note": "Validation 上更亮眼的 5 因子模型在 test 上转为负收益，最终保留样本外更稳健的 2 因子版本。"
+}

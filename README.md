@@ -1,4 +1,5 @@
-ant Research
+# BTCUSDT 15m Quant Research
+
 基于 **BTCUSDT 15 分钟级别永续合约数据** 的量化研究项目。仓库分成两部分：
 
 1. **Factor Research**：先做因子构建、单因子检验、候选组合验证，最后得到更稳健的双因子模型。  
@@ -24,7 +25,7 @@ ant Research
 - `premium_df`
 - `funding_df`
 
-- 预测未来4h收益率：
+预测未来4h收益率：
 ```python
 fwd_ret_4h = close.shift(-16) / close - 1
 ```
@@ -40,6 +41,7 @@ fwd_ret_4h = close.shift(-16) / close - 1
 - 短周期收益状态：`ret_15m`
 
 对所有基础特征都做 rolling z-score 标准化。
+
 ---
 
 ## 2. Part A: Factor Research

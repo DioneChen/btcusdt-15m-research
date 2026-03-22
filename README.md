@@ -131,10 +131,6 @@ Validation 阶段表现更强但样本外衰减的五因子模型：
 
 ### 3.6 Model comparison figures
 
-结果汇总：
-
-![results summary](assets/model_compare/results_summary.png)
-
 XGBoost 测试集累计收益曲线：
 
 ![xgboost curve](assets/model_compare/xgboost_test_curve.png)

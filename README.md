@@ -27,7 +27,7 @@ ant Research
 - 预测未来4h收益率：
 ```python
 fwd_ret_4h = close.shift(-16) / close - 1
-
+```
 
 - 基础因子（16个）：
 - 波动率：`rv_4h`, `rv_8h`

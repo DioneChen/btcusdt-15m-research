@@ -1,13 +1,10 @@
-# BTCUSDT 15m Quant Research
-
+ant Research
 基于 **BTCUSDT 15 分钟级别永续合约数据** 的量化研究项目。仓库分成两部分：
 
 1. **Factor Research**：先做因子构建、单因子检验、候选组合验证，最后得到更稳健的双因子模型。  
-2. **Model Comparison**：在相同数据区间和相同特征工程下，对 **LSTM / XGBoost / LightGBM** 三个模型做统一训练与样本外比较。
+2. **Model Research**：在相同数据区间和相同特征工程下，对 **LSTM / XGBoost / LightGBM** 三个模型做统一训练与样本外比较。
 
-整个项目强调两件事：
-- 必须使用 **train / validation / test** 的时间序列切分，避免未来信息泄露。
-- 评价标准不只看预测误差，还要看 **IC、RankIC、方向准确率、手续费后的策略表现**。
+- 并使用 train / validation / test 的时间序列切分，避免未来信息泄露；评价综合考虑标准误差、 IC、RankIC、方向准确率、手续费后的策略表现，更好的选择因子和模型来进行未来4h的收益率预测。
 
 ---
 
@@ -20,24 +17,38 @@
 - Validation: **2025-12-01 ~ 2026-01-15**
 - Test: **2026-01-16 ~ 2026-02-28**
 
-原始数据放在 `data/raw/`，支持 `csv` 或 `parquet`：
+原始数据在 `data/raw/`，以 `parquet`格式存储：
 - `price_df`
 - `mark_df`
 - `index_df`
 - `premium_df`
 - `funding_df`
 
+- 预测未来4h收益率：
+```python
+fwd_ret_4h = close.shift(-16) / close - 1
+
+- 基础因子（16个）：
+- 波动率：`rv_4h`, `rv_8h`
+- 反转：`rev_1h`, `rev_4h`
+- 动量：`mom_4h`, `mom_8h`
+- 成交量：`vol_4h`, `vol_24h`, `vol_surge_4h`
+- 基差与价差：`mark_index_spread`, `spread_change_4h`
+- 订单流：`taker_buy_imbalance`
+- 资金费率：`funding_state`, `funding_change`, `funding_dev`
+- 短周期收益状态：`ret_15m`
+
+- d对所有基础特征都做 rolling z-score 标准化。
 ---
 
 ## 2. Part A: Factor Research
 
 ### 2.1 Research goal
 
-先从波动率、反转、动量、量能、基差、订单流和资金费率偏离等维度构造候选因子，再通过单因子 IC、月度稳定性、分组收益和组合回测筛选更稳健的信号。
+先从波动率、反转、动量、量能、基差、订单流和资金费率偏离等维度构造候选因子，再通过单因子 IC、月度稳定性、分组收益和组合回测筛选其中更稳健的因子。
 
 ### 2.2 Final factor conclusion
 
-研究中发现：
 - **5 因子模型** 在 validation 上表现最好，但到了 test 阶段明显衰减。
 - 真正能在样本外继续保留有效性的，主要是两个因子：
   - `vol_surge_4h`: 短期放量因子，正向使用
@@ -53,45 +64,26 @@ score = 0.5 * vol_surge_4h_z_lag1 - 0.5 * mom_8h_z_lag1
 
 Validation 阶段最优双因子模型：
 
-![validation two factor](assets/validation_two_factor_q80_20.png)
+![validation two factor](assets/factor/validation_two_factor_q80_20.png)
 
 Final test 双因子模型：
 
-![test two factor](assets/test_two_factor.png)
+![test two factor](assets/factor/test_two_factor.png)
 
 Validation 阶段表现更强但样本外衰减的五因子模型：
 
-![validation five factor](assets/validation_five_factor_q60_40.png)
+![validation five factor](assets/factor/validation_five_factor_q60_40.png)
 
-![test five factor](assets/test_five_factor.png)
+![test five factor](assets/factor/test_five_factor.png)
 
 ---
 
-## 3. Part B: LSTM / XGBoost / LightGBM Comparison
+## 3. Part B: LSTM / XGBoost / LightGBM Model
 
-### 3.1 Target and features
+### 3.1 Modeling approach
 
-预测目标为 **未来 4 小时收益率**：
-
-```python
-fwd_ret_4h = close.shift(-16) / close - 1
-```
-
-基础因子共 16 个，包括：
-- 波动率：`rv_4h`, `rv_8h`
-- 反转：`rev_1h`, `rev_4h`
-- 动量：`mom_4h`, `mom_8h`
-- 成交量：`vol_4h`, `vol_24h`, `vol_surge_4h`
-- 基差与价差：`mark_index_spread`, `spread_change_4h`
-- 订单流：`taker_buy_imbalance`
-- 资金费率：`funding_state`, `funding_change`, `funding_dev`
-- 短周期收益状态：`ret_15m`
-
-所有基础特征都做 rolling z-score 标准化。
-
-建模方式：
-- **树模型**：对 16 个基础因子做 `[0, 1, 4, 16]` 的滞后展开，形成 `64` 个表格特征。
-- **LSTM**：使用过去 `32` 根 15min bar 作为序列输入，对应 `8` 小时历史窗口。
+- **XGBoost / LightGBM**：对 16 个基础因子做 [0, 1, 4, 16] 的滞后展开，形成 64 个表格特征。
+- **LSTM**：使用过去 32 根 15min bar 作为序列输入，对应 8 小时历史窗口。
 
 ### 3.2 Overfitting control
 
@@ -109,8 +101,8 @@ fwd_ret_4h = close.shift(-16) / close - 1
 
 ### 3.3 Trading setup
 
-- 调仓周期：`hold_bars = 16`，即每 4 小时调仓一次
-- 手续费：`fee_bps = 5.0`，即单边 `5 bps = 0.05%`
+- 调仓周期：每 4 小时调仓一次，`hold_bars = 16`
+- 手续费：`fee_bps = 5.0`
 - 非重叠持有：避免 4h 标签重叠导致回测失真
 - 策略收益：`position * fwd_ret_4h - fee`
 
@@ -242,12 +234,10 @@ python scripts/06_run_three_model_compare.py --raw-dir data/raw --output-dir out
 python scripts/07_plot_three_model_results.py --output-dir outputs --summary-csv results/model_compare_summary.csv --figure-dir assets/model_compare
 ```
 
-> 说明：仓库中已经放入本次实验生成的结果图和结果表；重新运行脚本后，你可以用自己的最新结果覆盖这些文件。
-
 ---
 
 ## 6. Notes
 
-- 因子研究部分的最终结论是：**简化后的双因子模型比更复杂的五因子模型更稳健**。
-- 三模型比较部分的最终结论是：**在本次样本与特征设定下，XGBoost 明显优于 LightGBM 和 LSTM**。
-- 这个仓库更偏向研究原型，不是可直接上线的实盘系统；下一步更适合做滑点建模、滚动重训练、不同市场阶段鲁棒性测试和仓位管理。
+- 因子研究部分：**简化后的双因子模型比更复杂的五因子模型更稳健**。
+- LSTM / XGBoost / LightGBM 模型部分：**在本次样本与特征设定下，XGBoost 明显优于 LightGBM 和 LSTM**。
+- 本项目仅作研究，暂不可实盘操作。

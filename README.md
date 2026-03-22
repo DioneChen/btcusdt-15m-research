@@ -185,8 +185,8 @@ btcusdt-15m-factor-research/
 │  ├─ single_factor_research.py
 │  ├─ validate_candidate_models.py
 │  ├─ run_final_two_factor_model.py
-│  ├─ 06_run_three_model_compare.py
-│  └─ 07_plot_three_model_results.py
+│  ├─ run_three_model_compare.py
+│  └─ plot_three_model_results.py
 ├─ src/
 │  └─ btcusdt_15m_factor_research/
 │     ├─ backtest_utils.py
@@ -230,8 +230,8 @@ python scripts/run_final_two_factor_model.py --config config/project_config.exam
 ### 5.3 Three-model comparison pipeline
 
 ```bash
-python scripts/06_run_three_model_compare.py --raw-dir data/raw --output-dir outputs
-python scripts/07_plot_three_model_results.py --output-dir outputs --summary-csv results/model_compare_summary.csv --figure-dir assets/model_compare
+python scripts/run_three_model_compare.py --raw-dir data/raw --output-dir outputs
+python scripts/plot_three_model_results.py --output-dir outputs --summary-csv results/model_compare_summary.csv --figure-dir assets/model_compare
 ```
 
 ---

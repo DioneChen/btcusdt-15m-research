@@ -29,7 +29,7 @@ ant Research
 fwd_ret_4h = close.shift(-16) / close - 1
 ```
 
-- 基础因子（16个）：
+基础因子（16个）：
 - 波动率：`rv_4h`, `rv_8h`
 - 反转：`rev_1h`, `rev_4h`
 - 动量：`mom_4h`, `mom_8h`
@@ -39,7 +39,7 @@ fwd_ret_4h = close.shift(-16) / close - 1
 - 资金费率：`funding_state`, `funding_change`, `funding_dev`
 - 短周期收益状态：`ret_15m`
 
-- d对所有基础特征都做 rolling z-score 标准化。
+对所有基础特征都做 rolling z-score 标准化。
 ---
 
 ## 2. Part A: Factor Research

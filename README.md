@@ -28,6 +28,7 @@ ant Research
 ```python
 fwd_ret_4h = close.shift(-16) / close - 1
 
+
 - 基础因子（16个）：
 - 波动率：`rv_4h`, `rv_8h`
 - 反转：`rev_1h`, `rev_4h`
@@ -128,17 +129,9 @@ Validation 阶段表现更强但样本外衰减的五因子模型：
 
 ### 3.6 Model comparison figures
 
-特征预览：
-
-![feature preview](assets/model_compare/feature_preview.png)
-
 结果汇总：
 
 ![results summary](assets/model_compare/results_summary.png)
-
-指标对比图：
-
-![metric comparison](assets/model_compare/model_metric_comparison.png)
 
 XGBoost 测试集累计收益曲线：
 
@@ -154,70 +147,16 @@ LSTM 测试集累计收益曲线：
 
 ---
 
-## 4. Project Structure
+## 4. How to Run
 
-```text
-btcusdt-15m-factor-research/
-├─ assets/
-│  ├─ test_five_factor.png
-│  ├─ test_two_factor.png
-│  ├─ validation_five_factor_q60_40.png
-│  ├─ validation_two_factor_q80_20.png
-│  └─ model_compare/
-│     ├─ feature_preview.png
-│     ├─ results_summary.png
-│     ├─ model_metric_comparison.png
-│     ├─ xgboost_test_curve.png
-│     ├─ lightgbm_test_curve.png
-│     └─ lstm_test_curve.png
-├─ config/
-│  └─ project_config.example.json
-├─ data/
-│  └─ raw/
-├─ outputs/
-├─ results/
-│  ├─ factor_decay.csv
-│  ├─ final_summary.json
-│  └─ model_compare_summary.csv
-├─ scripts/
-│  ├─ fetch_binance_futures_data.py
-│  ├─ build_research_dataset.py
-│  ├─ single_factor_research.py
-│  ├─ validate_candidate_models.py
-│  ├─ run_final_two_factor_model.py
-│  ├─ run_three_model_compare.py
-│  └─ plot_three_model_results.py
-├─ src/
-│  └─ btcusdt_15m_factor_research/
-│     ├─ backtest_utils.py
-│     ├─ data_pipeline.py
-│     ├─ feature_engineering.py
-│     ├─ research_utils.py
-│     └─ model_compare/
-│        ├─ config.py
-│        ├─ data_pipeline.py
-│        ├─ evaluation.py
-│        ├─ models.py
-│        ├─ plot_results.py
-│        ├─ train_compare.py
-│        └─ utils.py
-├─ .gitignore
-├─ pyproject.toml
-└─ requirements.txt
-```
-
----
-
-## 5. How to Run
-
-### 5.1 Install
+### 4.1 Install
 
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### 5.2 Factor research pipeline
+### 4.2 Factor research pipeline
 
 ```bash
 python scripts/fetch_binance_futures_data.py --config config/project_config.example.json
@@ -227,7 +166,7 @@ python scripts/validate_candidate_models.py --config config/project_config.examp
 python scripts/run_final_two_factor_model.py --config config/project_config.example.json
 ```
 
-### 5.3 Three-model comparison pipeline
+### 4.3 Three-model comparison pipeline
 
 ```bash
 python scripts/run_three_model_compare.py --raw-dir data/raw --output-dir outputs
@@ -236,7 +175,7 @@ python scripts/plot_three_model_results.py --output-dir outputs --summary-csv re
 
 ---
 
-## 6. Notes
+## 5. Notes
 
 - 因子研究部分：**简化后的双因子模型比更复杂的五因子模型更稳健**。
 - LSTM / XGBoost / LightGBM 模型部分：**在本次样本与特征设定下，XGBoost 明显优于 LightGBM 和 LSTM**。
